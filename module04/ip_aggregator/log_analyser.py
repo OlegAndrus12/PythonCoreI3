@@ -3,6 +3,8 @@ from pathlib import Path
 
 LOGS = Path(__file__).parent / "logs.txt"
 
+
+
 # [02/Jun/2025 15:05:03] WARNING [django.security] ... - 10.0.0.2
 LINE_RE = re.compile(
     r"\s(?P<level>\w+)"                         # \s — space before level; \w+ — word chars (ERROR/WARNING/INFO)
