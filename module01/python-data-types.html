@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Шпаргалка з типів даних Python</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Onest:wght@600;800&display=swap">
+<style>
+/* Layout: tabbed cheatsheet. Sticky tab rail of types; each panel = header, properties, methods, REPL cells. */
+:root {
+  --bg: #f3f5f8;
+  --surface: #ffffff;
+  --ink: #141a24;
+  --muted: #5a6476;
+  --line: #dbe0e8;
+  --accent: #2354c7;
+  --accent-soft: #e6edfb;
+  --err: #b4322b;
+  --err-soft: #fbeceb;
+  --ok: #1f7a4d;
+  /* memory roles */
+  --m-gc: #eceef2;   --m-gc-ink: #6b7384;
+  --m-head: #dfe7f7; --m-head-ink: #23407f;
+  --m-meta: #ece3f7; --m-meta-ink: #5a3290;
+  --m-ptr: #d9f0ec;  --m-ptr-ink: #105e52;
+  --m-data: #fbefc9; --m-data-ink: #7a5300;
+  --m-empty: #f6f7f9; --m-empty-ink: #9aa2b1;
+  --font-display: "Onest", "Helvetica Neue", Arial, sans-serif;
+  --font-body: "IBM Plex Sans", -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --radius: 6px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e1218; --surface: #151b24; --ink: #e5e9f0; --muted: #98a2b4; --line: #283141;
+    --accent: #86a8ff; --accent-soft: #1b2740; --err: #ff8a80; --err-soft: #3a1d1d; --ok: #6fd3a0;
+    --m-gc: #1d222b; --m-gc-ink: #8d96a7;
+    --m-head: #1b2a48; --m-head-ink: #a9c1f7;
+    --m-meta: #2b2140; --m-meta-ink: #cdb4f5;
+    --m-ptr: #12322d; --m-ptr-ink: #8fe0d1;
+    --m-data: #3a2f12; --m-data-ink: #f4d27a;
+    --m-empty: #181d25; --m-empty-ink: #5f6878;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e1218; --surface: #151b24; --ink: #e5e9f0; --muted: #98a2b4; --line: #283141;
+  --accent: #86a8ff; --accent-soft: #1b2740; --err: #ff8a80; --err-soft: #3a1d1d; --ok: #6fd3a0;
+  --m-gc: #1d222b; --m-gc-ink: #8d96a7;
+  --m-head: #1b2a48; --m-head-ink: #a9c1f7;
+  --m-meta: #2b2140; --m-meta-ink: #cdb4f5;
+  --m-ptr: #12322d; --m-ptr-ink: #8fe0d1;
+  --m-data: #3a2f12; --m-data-ink: #f4d27a;
+  --m-empty: #181d25; --m-empty-ink: #5f6878;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: 15px; line-height: 1.55;
+  padding-inline: 16px; padding-block: 0 64px;
+}
+.wrap { max-width: 1180px; margin: 0 auto; }
+code, pre, .mono { font-family: var(--font-mono); font-size: 0.9em; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 3px; }
+
+/* header */
+.top { padding-block: 32px 18px; display: flex; flex-wrap: wrap; gap: 12px 32px; align-items: end; justify-content: space-between; }
+.eyebrow { font-family: var(--font-mono); font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); }
+h1 { font-family: var(--font-display); font-weight: 800; font-size: clamp(28px, 4.4vw, 42px); line-height: 1.05; margin: 6px 0 8px; letter-spacing: -0.01em; text-wrap: balance; }
+.lede { margin: 0; color: var(--muted); max-width: 62ch; }
+.key-legend { display: flex; gap: 16px; font-size: 13px; color: var(--muted); }
+.key-legend span { display: inline-flex; align-items: center; gap: 6px; }
+
+/* tabs */
+.tabs {
+  position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5;
+  background: var(--bg); border-bottom: 1px solid var(--line);
+  margin-inline: -16px; padding-inline: 16px;
+}
+.tablist { max-width: 1180px; margin: 0 auto; display: flex; gap: 2px; overflow-x: auto; scrollbar-width: none; }
+.tablist::-webkit-scrollbar { display: none; }
+.tab {
+  appearance: none; border: 0; background: none; cursor: pointer; color: var(--muted);
+  font-family: var(--font-mono); font-size: 15px; font-weight: 500;
+  padding: 12px 14px 11px; border-bottom: 3px solid transparent; white-space: nowrap;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.tab:hover { color: var(--ink); }
+.tab[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); font-weight: 700; }
+.dot { width: 8px; height: 8px; border-radius: 50%; border: 1.5px solid currentColor; flex: none; }
+.dot.mut { background: currentColor; }
+.tab .dot { color: var(--accent); }
+.tab.compare { margin-left: auto; font-family: var(--font-body); }
+
+/* panel header */
+.panel { padding-block: 28px 0; }
+.p-head { display: grid; grid-template-columns: auto 1fr; gap: 6px 28px; align-items: start; }
+.p-name { font-family: var(--font-mono); font-weight: 700; font-size: clamp(44px, 8vw, 76px); line-height: 0.95; letter-spacing: -0.03em; color: var(--accent); }
+.p-tag { font-size: 18px; margin: 4px 0 12px; max-width: 60ch; text-wrap: pretty; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.chip { font-family: var(--font-mono); font-size: 13px; background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: 2px 8px; }
+.flags { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 14px; font-size: 13px; }
+.flag { display: inline-flex; gap: 6px; align-items: baseline; }
+.flag b { font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; font-size: 11px; color: var(--muted); }
+.flag .yes { color: var(--ok); font-weight: 600; }
+.flag .no { color: var(--muted); }
+@media (max-width: 640px) { .p-head { grid-template-columns: 1fr; } }
+
+/* sections */
+section.s { margin-top: 40px; }
+.s-h { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 16px; border-bottom: 1px solid var(--line); padding-bottom: 8px; margin-bottom: 18px; }
+h2 { font-family: var(--font-display); font-weight: 600; font-size: 22px; margin: 0; letter-spacing: -0.005em; }
+.s-h .sub { color: var(--muted); font-size: 13px; }
+.s-h .grow { flex: 1; }
+
+/* properties */
+.props { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 18px 36px; }
+.prop { min-width: 0; padding-top: 10px; border-top: 1px solid var(--line); }
+.prop h3 { font-size: 15px; font-weight: 600; margin: 0 0 3px; }
+.prop p { margin: 0; color: var(--muted); font-size: 14px; }
+.prop code, .notes code, .m-desc code { color: var(--ink); background: var(--surface); border: 1px solid var(--line); padding: 0 4px; border-radius: 3px; font-size: 0.86em; }
+
+/* methods */
+.filter { font-family: var(--font-mono); font-size: 14px; padding: 6px 10px; border: 1px solid var(--line); border-radius: 4px; background: var(--surface); color: var(--ink); width: min(100%, 16em); }
+.m-group { font-size: 12px; text-transform: uppercase; letter-spacing: 0.07em; font-weight: 600; color: var(--muted); margin: 22px 0 6px; }
+.m-group:first-child { margin-top: 0; }
+.m-row { display: grid; grid-template-columns: minmax(0, 15rem) minmax(0, 1fr) minmax(0, 1.25fr); gap: 6px 24px; padding: 12px 0; border-bottom: 1px solid var(--line); align-items: start; }
+.m-name { font-family: var(--font-mono); font-weight: 700; font-size: 15px; }
+.m-sig { font-family: var(--font-mono); font-size: 12px; color: var(--muted); overflow-wrap: anywhere; margin-top: 2px; }
+.m-desc { font-size: 14px; }
+.m-empty { color: var(--muted); padding: 12px 0; }
+@media (max-width: 900px) { .m-row { grid-template-columns: 1fr; } }
+.m-note { font-size: 14px; color: var(--muted); margin: -6px 0 12px; }
+
+/* code cells */
+.cell { min-width: 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }
+.cell pre { margin: 0; padding: 8px 12px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+.cell .res { border-top: 1px dashed var(--line); padding: 6px 12px; font-family: var(--font-mono); font-size: 13px; overflow-x: auto; white-space: pre; display: flex; gap: 8px; }
+.cell .res::before { content: "→"; color: var(--muted); flex: none; }
+.cell .res.err { background: var(--err-soft); color: var(--err); }
+.cell .res.err::before { content: "✕"; }
+.cell .stdout { padding: 4px 12px 0; font-family: var(--font-mono); font-size: 12.5px; color: var(--muted); white-space: pre; }
+.cell .stdout::before { content: "виводить: "; font-family: var(--font-body); }
+.cell .note { padding: 0 12px 8px; font-size: 12.5px; color: var(--muted); }
+.ops { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 270px), 1fr)); gap: 12px; }
+.ops .cell .note { padding-top: 6px; }
+.tk-k { color: var(--m-meta-ink); font-weight: 500; }
+.tk-s { color: var(--ok); }
+.tk-n { color: var(--m-data-ink); }
+.tk-b { color: var(--accent); }
+.tk-c { color: var(--muted); font-style: italic; }
+
+/* truth table + compare */
+.tbl-scroll { overflow-x: auto; }
+table.t { border-collapse: collapse; font-size: 14px; width: 100%; }
+table.t th, table.t td { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+table.t th { font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); font-weight: 600; }
+table.t td.n { font-family: var(--font-mono); text-align: right; font-variant-numeric: tabular-nums; }
+table.t td.y { color: var(--ok); font-weight: 600; }
+table.t td.x { color: var(--muted); }
+table.t td code { font-weight: 700; }
+table.t tbody tr:hover { background: var(--surface); }
+.truth td { font-family: var(--font-mono); text-align: center; }
+.truth th { text-align: center; }
+
+footer { margin-top: 56px; padding-top: 16px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; }
+footer p { margin: 0 0 4px; max-width: 80ch; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .panel { animation: rise 0.22s ease-out; }
+  @keyframes rise { from { transform: translateY(4px); opacity: 0.6; } to { transform: none; opacity: 1; } }
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div>
+      <div class="eyebrow" id="ver">CPython 3.14</div>
+      <h1>Шпаргалка з типів даних Python</h1>
+      <p class="lede">Що таке кожен вбудований тип, його ключові властивості та всі публічні методи з реальними результатами.</p>
+    </div>
+    <div class="key-legend" aria-label="Позначки вкладок">
+      <span><i class="dot mut" style="color:var(--accent)"></i>змінний</span>
+      <span><i class="dot" style="color:var(--accent)"></i>незмінний</span>
+    </div>
+  </header>
+</div>
+<nav class="tabs" aria-label="Типи даних">
+  <div class="tablist" role="tablist" id="tablist"></div>
+</nav>
+<main class="wrap" id="panels"></main>
+<div class="wrap">
+  <footer>
+    <p>Кожен результат на цій сторінці отримано справжнім запуском прикладу в CPython <span id="ver2">3.14</span>.</p>
+  </footer>
+</div>
+
+<script>
+const DATA = {"order": ["int", "None", "str", "bool", "list", "dict", "tuple", "set"], "tabs": {"int": {"title": "int", "tagline": "Цілі числа будь-якого розміру. Переповнення не буває: число може бути таким великим, наскільки вистачить пам'яті.", "literals": ["42", "-7", "1_000_000", "0b1010", "0o17", "0xFF", "int('42')"], "flags": {"Змінний": false, "Хешований": true, "Впорядкований": null, "Ітерований": false}, "props": [{"t": "Довільна точність", "d": "Немає фіксованої розрядності, як 32 чи 64 біти в C. `2 ** 1000` обчислюється точно; обмеження лише одне: пам'ять."}, {"t": "Незмінний тип", "d": "`x += 1` не змінює сам об'єкт. Створюється новий int, і ім'я `x` починає посилатися на нього, тому `id(x)` змінюється."}, {"t": "Кеш малих чисел", "d": "Числа від -5 до 256 створюються один раз під час запуску інтерпретатора і використовуються спільно. Тому `a = 256; b = 256; a is b` дає True, а з 257 може дати False. Числа порівнюйте через `==`, а не `is`."}, {"t": "Правила ділення", "d": "`/` завжди повертає float. `//` округлює вниз, до мінус нескінченності, тому `-7 // 2 == -4`. Знак результату `%` збігається зі знаком дільника: `-7 % 3 == 2`."}, {"t": "Обмеження на перетворення з рядка", "d": "За замовчуванням `int()` не приймає рядки, довші за 4300 цифр, щоб захиститися від надто повільного розбору. Ліміт змінює `sys.set_int_max_str_digits()`."}, {"t": "bool — це int", "d": "`True` і `False` є екземплярами підкласу int і дорівнюють 1 та 0."}], "methods": [{"name": "bit_length", "sig": "int.bit_length()", "desc": "Кількість бітів, потрібних для запису числа у двійковому вигляді, без знака й ведучих нулів.", "ex": "(37).bit_length()", "group": null, "out": "6", "err": false, "stdout": "", "warn": []}, {"name": "bit_count", "sig": "int.bit_count()", "desc": "Кількість одиничних бітів у двійковому записі модуля числа.", "ex": "(37).bit_count()", "group": null, "out": "3", "err": false, "stdout": "", "warn": []}, {"name": "to_bytes", "sig": "int.to_bytes(length=1, byteorder='big', *, signed=False)", "desc": "Перетворює число на об'єкт bytes заданої довжини. Якщо число не вміщається, виникає OverflowError.", "ex": "(1024).to_bytes(2, 'big')", "group": null, "out": "b'\\x04\\x00'", "err": false, "stdout": "", "warn": []}, {"name": "from_bytes", "sig": "int.from_bytes(bytes, byteorder='big', *, signed=False)", "desc": "Метод класу: створює int із сирих байтів. Обернений до to_bytes.", "ex": "int.from_bytes(b'\\x04\\x00', 'big')", "group": null, "out": "1024", "err": false, "stdout": "", "warn": []}, {"name": "as_integer_ratio", "sig": "int.as_integer_ratio()", "desc": "Повертає пару (чисельник, знаменник). Для int знаменник завжди 1.", "ex": "(10).as_integer_ratio()", "group": null, "out": "(10, 1)", "err": false, "stdout": "", "warn": []}, {"name": "is_integer", "sig": "int.is_integer()", "desc": "Для int завжди True. Існує, щоб int і float мали спільний інтерфейс (з'явився в 3.12).", "ex": "(7).is_integer()", "group": null, "out": "True", "err": false, "stdout": "", "warn": []}, {"name": "conjugate", "sig": "int.conjugate()", "desc": "Комплексне спряження. Для дійсного числа повертає саме число.", "ex": "(5).conjugate()", "group": null, "out": "5", "err": false, "stdout": "", "warn": []}, {"name": "real", "sig": "int.real", "desc": "Атрибут: дійсна частина, тобто саме число.", "ex": "(5).real", "group": null, "out": "5", "err": false, "stdout": "", "warn": []}, {"name": "imag", "sig": "int.imag", "desc": "Атрибут: уявна частина, завжди 0.", "ex": "(5).imag", "group": null, "out": "0", "err": false, "stdout": "", "warn": []}, {"name": "numerator", "sig": "int.numerator", "desc": "Атрибут: чисельник числа як дробу, тобто саме число.", "ex": "(5).numerator", "group": null, "out": "5", "err": false, "stdout": "", "warn": []}, {"name": "denominator", "sig": "int.denominator", "desc": "Атрибут: знаменник числа як дробу, завжди 1.", "ex": "(5).denominator", "group": null, "out": "1", "err": false, "stdout": "", "warn": []}], "ops": [{"ex": "7 / 2", "note": "звичайне ділення, завжди float", "out": "3.5", "err": false, "stdout": "", "warn": []}, {"ex": "7 // 2", "note": "цілочисельне ділення", "out": "3", "err": false, "stdout": "", "warn": []}, {"ex": "-7 // 2", "note": "округлення до мінус нескінченності", "out": "-4", "err": false, "stdout": "", "warn": []}, {"ex": "7 % 3", "note": "остача від ділення", "out": "1", "err": false, "stdout": "", "warn": []}, {"ex": "-7 % 3", "note": "знак як у дільника", "out": "2", "err": false, "stdout": "", "warn": []}, {"ex": "2 ** 100", "note": "точно, без переповнення", "out": "1267650600228229401496703205376", "err": false, "stdout": "", "warn": []}, {"ex": "divmod(17, 5)", "note": "(частка, остача)", "out": "(3, 2)", "err": false, "stdout": "", "warn": []}, {"ex": "abs(-5)", "note": "модуль числа", "out": "5", "err": false, "stdout": "", "warn": []}, {"ex": "round(1234, -2)", "note": "округлення до сотень", "out": "1200", "err": false, "stdout": "", "warn": []}, {"ex": "pow(2, 10, 1000)", "note": "(2 ** 10) % 1000, але швидше", "out": "24", "err": false, "stdout": "", "warn": []}, {"ex": "int('ff', 16)", "note": "розбір у шістнадцятковій системі", "out": "255", "err": false, "stdout": "", "warn": []}, {"ex": "int(3.99)", "note": "відкидає дробову частину", "out": "3", "err": false, "stdout": "", "warn": []}, {"ex": "bin(10), oct(10), hex(255)", "note": "двійковий, вісімковий, шістнадцятковий запис", "out": "('0b1010', '0o12', '0xff')", "err": false, "stdout": "", "warn": []}, {"ex": "5 & 3, 5 | 3, 5 ^ 3, 1 << 4", "note": "побітові «і», «або», виключне «або», зсув", "out": "(1, 7, 6, 16)", "err": false, "stdout": "", "warn": []}, {"ex": "0.1 + 0.2 == 0.3", "note": "це float, а не int, але класичний сюрприз", "out": "False", "err": false, "stdout": "", "warn": []}]}, "None": {"title": "None", "tagline": "Єдиний об'єкт, що означає «значення немає». Його тип — NoneType.", "literals": ["None"], "flags": {"Змінний": false, "Хешований": true, "Впорядкований": null, "Ітерований": false}, "props": [{"t": "Синглтон", "d": "В інтерпретаторі існує рівно один об'єкт None, і кожне `None` у коді посилається саме на нього. Тому перевіряйте `x is None`, а не `x == None`: клас може перевизначити `==`, але підробити `is` не може."}, {"t": "Хибне значення", "d": "`bool(None)` дорівнює False. Але `if not x` спрацює також для 0, '' та []. Якщо вам потрібен саме None, пишіть `if x is None`."}, {"t": "Значення, яке повертається за замовчуванням", "d": "Функція без `return` або з порожнім `return` повертає None. Так само поводяться методи, що змінюють об'єкт на місці, як-от `list.sort()` і `list.append()`."}, {"t": "Безпечний аргумент за замовчуванням", "d": "Пишіть `def f(items=None): if items is None: items = []`. Змінне значення за замовчуванням, як-от `items=[]`, створюється один раз і спільне для всіх викликів."}, {"t": "Не порівнюється за величиною", "d": "`None < 1` викликає TypeError. `None == 0` і `None == False` обидва дають False."}], "methods": [], "no_methods": "NoneType не має публічних методів. Натомість із None використовують такі операції.", "ops": [{"ex": "x = None\nx is None", "note": "правильна перевірка", "out": "True", "err": false, "stdout": "", "warn": []}, {"ex": "x = None\nx is not None", "note": "перевірка, що значення є", "out": "False", "err": false, "stdout": "", "warn": []}, {"ex": "bool(None)", "note": "хибне значення", "out": "False", "err": false, "stdout": "", "warn": []}, {"ex": "None == 0, None == False", "note": "None дорівнює лише самому собі", "out": "(False, False)", "err": false, "stdout": "", "warn": []}, {"ex": "str(None)", "note": "перетворення на рядок", "out": "'None'", "err": false, "stdout": "", "warn": []}, {"ex": "type(None)", "note": "тип None", "out": "<class 'NoneType'>", "err": false, "stdout": "", "warn": []}, {"ex": "type(None)() is None", "note": "виклик NoneType повертає той самий синглтон", "out": "True", "err": false, "stdout": "", "warn": []}, {"ex": "result = [3, 1, 2].sort()\nresult", "note": "методи, що змінюють об'єкт на місці, повертають None", "out": "None", "err": false, "stdout": "", "warn": []}, {"ex": "{}.get('missing')", "note": "поширене джерело None", "out": "None", "err": false, "stdout": "", "warn": []}, {"ex": "def greet():\n    print('hi')\ngreet() is None", "note": "немає return — повертається None", "out": "True", "err": false, "stdout": "hi\n", "warn": []}, {"ex": "None < 1", "note": "None не можна порівнювати за величиною", "out": "TypeError: '<' not supported between instances of 'NoneType' and 'int'", "err": true, "stdout": "", "warn": []}]}, "str": {"title": "str", "tagline": "Незмінна послідовність символів Unicode. Текст у Python 3 — це завжди str.", "literals": ["'single'", "\"double\"", "'''triple'''", "r'C:\\new'", "f'{name}'", "str(42)", "''.join(parts)"], "flags": {"Змінний": false, "Хешований": true, "Впорядкований": true, "Ітерований": true}, "props": [{"t": "Незмінний тип", "d": "Кожен метод повертає новий рядок. `s[0] = 'X'` викликає TypeError. Щоб змінити текст, створіть новий рядок."}, {"t": "Послідовність символів", "d": "Підтримує індексацію `s[0]`, від'ємні індекси `s[-1]`, зрізи `s[1:4]` і `s[::-1]`. Окремого типу «символ» немає: `s[0]` — це str довжиною 1."}, {"t": "len() рахує кодові точки", "d": "`len('😀') == 1`, а `len('👍🏽') == 2` (емодзі плюс відтінок шкіри), хоча `len('😀'.encode()) == 4` байти в UTF-8."}, {"t": "Інтернування", "d": "Літерали, схожі на імена, та окремі символи можуть бути спільними об'єктами. Це оптимізація, а не правило. Текст завжди порівнюйте через `==`."}, {"t": "Збирайте рядки через join", "d": "`s += part` у циклі може копіювати рядок знову і знову. Складіть частини в список і викличте `''.join(parts)` один раз."}, {"t": "Порівняння за кодовими точками", "d": "`'Z' < 'a'` дає True, бо 90 < 97. Щоб сортувати без урахування регістру, використовуйте `key=str.casefold`."}, {"t": "Шаблонні рядки (3.14)", "d": "`t'Hi {name}'` — новинка 3.14: такий літерал створює `string.templatelib.Template`, а не str. f-рядки й надалі дають str."}], "methods": [{"name": "capitalize", "sig": "str.capitalize()", "desc": "Перший символ у верхній регістр, решту — у нижній.", "ex": "'hello WORLD'.capitalize()", "group": "Регістр", "out": "'Hello world'", "err": false, "stdout": "", "warn": []}, {"name": "casefold", "sig": "str.casefold()", "desc": "Агресивне переведення в нижній регістр для порівняння без урахування регістру. Враховує літери на кшталт німецької ß.", "ex": "'Straße'.casefold()", "group": "Регістр", "out": "'strasse'", "err": false, "stdout": "", "warn": []}, {"name": "lower", "sig": "str.lower()", "desc": "Усі літери в нижній регістр.", "ex": "'Hello Kyiv'.lower()", "group": "Регістр", "out": "'hello kyiv'", "err": false, "stdout": "", "warn": []}, {"name": "upper", "sig": "str.upper()", "desc": "Усі літери у верхній регістр.", "ex": "'Hello Kyiv'.upper()", "group": "Регістр", "out": "'HELLO KYIV'", "err": false, "stdout": "", "warn": []}, {"name": "swapcase", "sig": "str.swapcase()", "desc": "Великі літери стають малими, і навпаки.", "ex": "'Hello'.swapcase()", "group": "Регістр", "out": "'hELLO'", "err": false, "stdout": "", "warn": []}, {"name": "title", "sig": "str.title()", "desc": "Перша літера кожного слова велика. Апостроф вважається межею слова: \"they're\" стає \"They'Re\".", "ex": "'hello world'.title()", "group": "Регістр", "out": "'Hello World'", "err": false, "stdout": "", "warn": []}, {"name": "count", "sig": "str.count(sub[, start[, end]])", "desc": "Кількість входжень sub, що не перекриваються.", "ex": "'banana'.count('an')", "group": "Пошук", "out": "2", "err": false, "stdout": "", "warn": []}, {"name": "find", "sig": "str.find(sub[, start[, end]])", "desc": "Найменший індекс, де знайдено sub, або -1, якщо не знайдено.", "ex": "'banana'.find('n'), 'banana'.find('x')", "group": "Пошук", "out": "(2, -1)", "err": false, "stdout": "", "warn": []}, {"name": "rfind", "sig": "str.rfind(sub[, start[, end]])", "desc": "Як find, але повертає найбільший індекс.", "ex": "'banana'.rfind('n')", "group": "Пошук", "out": "4", "err": false, "stdout": "", "warn": []}, {"name": "index", "sig": "str.index(sub[, start[, end]])", "desc": "Як find, але якщо sub не знайдено, викликає ValueError.", "ex": "'banana'.index('x')", "group": "Пошук", "out": "ValueError: substring not found", "err": true, "stdout": "", "warn": []}, {"name": "rindex", "sig": "str.rindex(sub[, start[, end]])", "desc": "Як rfind, але якщо sub не знайдено, викликає ValueError.", "ex": "'banana'.rindex('a')", "group": "Пошук", "out": "5", "err": false, "stdout": "", "warn": []}, {"name": "startswith", "sig": "str.startswith(prefix[, start[, end]])", "desc": "True, якщо рядок починається з prefix. prefix може бути кортежем варіантів.", "ex": "'img_001.jpg'.startswith(('img', 'photo'))", "group": "Пошук", "out": "True", "err": false, "stdout": "", "warn": []}, {"name": "endswith", "sig": "str.endswith(suffix[, start[, end]])", "desc": "True, якщо рядок закінчується на suffix. suffix може бути кортежем варіантів.", "ex": "'img_001.jpg'.endswith(('.jpg', '.png'))", "group": "Пошук", "out": "True", "err": false, "stdout": "", "warn": []}, {"name": "isalnum", "sig": "str.isalnum()", "desc": "True, якщо всі символи — літери або цифри і рядок не порожній.", "ex": "'abc123'.isalnum(), 'abc 123'.isalnum()", "group": "Перевірки", "out": "(True, False)", "err": false, "stdout": "", "warn": []}, {"name": "isalpha", "sig": "str.isalpha()", "desc": "True, якщо всі символи — літери будь-якої абетки.", "ex": "'Київ'.isalpha(), 'Kyiv1'.isalpha()", "group": "Перевірки", "out": "(True, False)", "err": false, "stdout": "", "warn": []}, {"name": "isascii", "sig": "str.isascii()", "desc": "True, якщо кожен символ належить до ASCII (U+0000–U+007F). Для порожнього рядка теж True.", "ex": "'Kyiv'.isascii(), 'Київ'.isascii()", "group": "Перевірки", "out": "(True, False)", "err": false, "stdout": "", "warn": []}, {"name": "isdecimal", "sig": "str.isdecimal()", "desc": "True лише для десяткових цифр 0–9, зокрема цифр інших писемностей. Найсуворіша перевірка на цифри.", "ex": "'123'.isdecimal(), '²'.isdecimal()", "group": "Перевірки", "out": "(True, False)", "err": false, "stdout": "", "warn": []}, {"name": "isdigit", "sig": "str.isdigit()", "desc": "Як isdecimal, але приймає ще й надрядкові символи на кшталт ².", "ex": "'²'.isdigit(), '½'.isdigit()", "group": "Перевірки", "out": "(True, False)", "err": false, "stdout": "", "warn": []}, {"name": "isnumeric", "sig": "str.isnumeric()", "desc": "Найширша перевірка: цифри, дроби, римські цифри, китайські числа.", "ex": "'½'.isnumeric(), '五'.isnumeric()", "group": "Перевірки", "out": "(True, True)", "err": false, "stdout": "", "warn": []}, {"name": "isidentifier", "sig": "str.isidentifier()", "desc": "True, якщо рядок є коректним ім'ям у Python. Ключові слова теж проходять, тому їх перевіряйте через keyword.iskeyword.", "ex": "'my_var'.isidentifier(), '2x'.isidentifier()", "group": "Перевірки", "out": "(True, False)", "err": false, "stdout": "", "warn": []}, {"name": "islower", "sig": "str.islower()", "desc": "True, якщо є хоча б одна літера і всі літери малі.", "ex": "'hello 42'.islower()", "group": "Перевірки", "out": "True", "err": false, "stdout": "", "warn": []}, {"name": "isupper", "sig": "str.isupper()", "desc": "True, якщо є хоча б одна літера і всі літери великі.", "ex": "'HTTP/2'.isupper()", "group": "Перевірки", "out": "True", "err": false, "stdout": "", "warn": []}, {"name": "istitle", "sig": "str.istitle()", "desc": "True, якщо кожне слово починається з великої літери, а далі йдуть малі.", "ex": "'Hello World'.istitle()", "group": "Перевірки", "out": "True", "err": false, "stdout": "", "warn": []}, {"name": "isspace", "sig": "str.isspace()", "desc": "True, якщо всі символи пробільні і рядок не порожній.", "ex": "' \\t\\n'.isspace(), ''.isspace()", "group": "Перевірки", "out": "(True, False)", "err": false, "stdout": "", "warn": []}, {"name": "isprintable", "sig": "str.isprintable()", "desc": "False, якщо рядок містить недруковані символи, як-от \\n.", "ex": "'line\\n'.isprintable()", "group": "Перевірки", "out": "False", "err": false, "stdout": "", "warn": []}, {"name": "split", "sig": "str.split(sep=None, maxsplit=-1)", "desc": "Розбиває рядок на список. Без sep ділить за пробільними символами і відкидає порожні частини.", "ex": "'a  b c'.split(), 'a,b,,c'.split(',')", "group": "Розбиття та з'єднання", "out": "(['a', 'b', 'c'], ['a', 'b', '', 'c'])", "err": false, "stdout": "", "warn": []}, {"name": "rsplit", "sig": "str.rsplit(sep=None, maxsplit=-1)", "desc": "Як split, але maxsplit рахується справа.", "ex": "'a.b.c'.rsplit('.', 1)", "group": "Розбиття та з'єднання", "out": "['a.b', 'c']", "err": false, "stdout": "", "warn": []}, {"name": "splitlines", "sig": "str.splitlines(keepends=False)", "desc": "Розбиває за переносами рядків (\\n, \\r\\n та іншими).", "ex": "'one\\ntwo\\r\\nthree'.splitlines()", "group": "Розбиття та з'єднання", "out": "['one', 'two', 'three']", "err": false, "stdout": "", "warn": []}, {"name": "partition", "sig": "str.partition(sep)", "desc": "Ділить за першим sep на кортеж із трьох частин (до, sep, після).", "ex": "'key=value=x'.partition('=')", "group": "Розбиття та з'єднання", "out": "('key', '=', 'value=x')", "err": false, "stdout": "", "warn": []}, {"name": "rpartition", "sig": "str.rpartition(sep)", "desc": "Ділить за останнім sep на кортеж із трьох частин.", "ex": "'archive.tar.gz'.rpartition('.')", "group": "Розбиття та з'єднання", "out": "('archive.tar', '.', 'gz')", "err": false, "stdout": "", "warn": []}, {"name": "join", "sig": "str.join(iterable)", "desc": "З'єднує елементи, вставляючи між ними цей рядок. Кожен елемент має бути str.", "ex": "', '.join(['Kyiv', 'Lviv', 'Odesa'])", "group": "Розбиття та з'єднання", "out": "'Kyiv, Lviv, Odesa'", "err": false, "stdout": "", "warn": []}, {"name": "strip", "sig": "str.strip(chars=None)", "desc": "Прибирає символи з обох кінців, за замовчуванням пробільні. chars — це набір символів, а не слово.", "ex": "'  hi  '.strip(), 'www.example.com'.strip('cmowz.')", "group": "Обрізання та вирівнювання", "out": "('hi', 'example')", "err": false, "stdout": "", "warn": []}, {"name": "lstrip", "sig": "str.lstrip(chars=None)", "desc": "Прибирає символи лише з лівого кінця.", "ex": "'0042'.lstrip('0')", "group": "Обрізання та вирівнювання", "out": "'42'", "err": false, "stdout": "", "warn": []}, {"name": "rstrip", "sig": "str.rstrip(chars=None)", "desc": "Прибирає символи лише з правого кінця.", "ex": "'line\\n'.rstrip()", "group": "Обрізання та вирівнювання", "out": "'line'", "err": false, "stdout": "", "warn": []}, {"name": "removeprefix", "sig": "str.removeprefix(prefix)", "desc": "Прибирає саме цей префікс, якщо він є (3.9+). Щоб відрізати слово, використовуйте цей метод, а не lstrip.", "ex": "'test_login'.removeprefix('test_')", "group": "Обрізання та вирівнювання", "out": "'login'", "err": false, "stdout": "", "warn": []}, {"name": "removesuffix", "sig": "str.removesuffix(suffix)", "desc": "Прибирає саме цей суфікс, якщо він є (3.9+).", "ex": "'report.pdf'.removesuffix('.pdf')", "group": "Обрізання та вирівнювання", "out": "'report'", "err": false, "stdout": "", "warn": []}, {"name": "center", "sig": "str.center(width, fillchar=' ')", "desc": "Розміщує текст по центру поля заданої ширини.", "ex": "'hi'.center(8, '*')", "group": "Обрізання та вирівнювання", "out": "'***hi***'", "err": false, "stdout": "", "warn": []}, {"name": "ljust", "sig": "str.ljust(width, fillchar=' ')", "desc": "Вирівнює текст по лівому краю поля заданої ширини.", "ex": "'hi'.ljust(6, '.')", "group": "Обрізання та вирівнювання", "out": "'hi....'", "err": false, "stdout": "", "warn": []}, {"name": "rjust", "sig": "str.rjust(width, fillchar=' ')", "desc": "Вирівнює текст по правому краю поля заданої ширини.", "ex": "'7'.rjust(3, '0')", "group": "Обрізання та вирівнювання", "out": "'007'", "err": false, "stdout": "", "warn": []}, {"name": "zfill", "sig": "str.zfill(width)", "desc": "Доповнює нулями зліва. Знак на початку лишається попереду.", "ex": "'-42'.zfill(5)", "group": "Обрізання та вирівнювання", "out": "'-0042'", "err": false, "stdout": "", "warn": []}, {"name": "expandtabs", "sig": "str.expandtabs(tabsize=8)", "desc": "Замінює символи табуляції пробілами до наступної позиції табуляції.", "ex": "'a\\tb'.expandtabs(4)", "group": "Обрізання та вирівнювання", "out": "'a   b'", "err": false, "stdout": "", "warn": []}, {"name": "replace", "sig": "str.replace(old, new, count=-1)", "desc": "Замінює входження old на new. count обмежує кількість замін (з 3.13 його можна передати за ім'ям).", "ex": "'aaa'.replace('a', 'b', 2)", "group": "Перетворення", "out": "'bba'", "err": false, "stdout": "", "warn": []}, {"name": "maketrans", "sig": "str.maketrans(x[, y[, z]])", "desc": "Статичний метод: створює таблицю заміни для translate(). z перелічує символи, які треба видалити.", "ex": "str.maketrans('ab', 'xy')", "group": "Перетворення", "out": "{97: 120, 98: 121}", "err": false, "stdout": "", "warn": []}, {"name": "translate", "sig": "str.translate(table)", "desc": "Замінює або видаляє символи за таблицею, яку зазвичай створює maketrans.", "ex": "'h-e-l-l-o'.translate(str.maketrans('', '', '-'))", "group": "Перетворення", "out": "'hello'", "err": false, "stdout": "", "warn": []}, {"name": "format", "sig": "str.format(*args, **kwargs)", "desc": "Підставляє значення на місце {}. Для того самого f-рядки зазвичай зрозуміліші.", "ex": "'{} is {:.1f} km away'.format('Lviv', 540.27)", "group": "Перетворення", "out": "'Lviv is 540.3 km away'", "err": false, "stdout": "", "warn": []}, {"name": "format_map", "sig": "str.format_map(mapping)", "desc": "Як format(**mapping), але використовує словник напряму, без копіювання.", "ex": "'{name} from {city}'.format_map({'name': 'Ann', 'city': 'Kyiv'})", "group": "Перетворення", "out": "'Ann from Kyiv'", "err": false, "stdout": "", "warn": []}, {"name": "encode", "sig": "str.encode(encoding='utf-8', errors='strict')", "desc": "Перетворює текст на bytes. В UTF-8 кирилична літера займає 2 байти.", "ex": "'Київ'.encode()", "group": "Перетворення", "out": "b'\\xd0\\x9a\\xd0\\xb8\\xd1\\x97\\xd0\\xb2'", "err": false, "stdout": "", "warn": []}], "ops": [{"ex": "'Py' + 'thon'", "note": "конкатенація, створює новий str", "out": "'Python'", "err": false, "stdout": "", "warn": []}, {"ex": "'ha' * 3", "note": "повторення", "out": "'hahaha'", "err": false, "stdout": "", "warn": []}, {"ex": "'th' in 'Python'", "note": "перевірка підрядка", "out": "True", "err": false, "stdout": "", "warn": []}, {"ex": "s = 'Python'\ns[0], s[-1]", "note": "індексація", "out": "('P', 'n')", "err": false, "stdout": "", "warn": []}, {"ex": "s = 'Python'\ns[1:4], s[::-1]", "note": "зрізи та розворот", "out": "('yth', 'nohtyP')", "err": false, "stdout": "", "warn": []}, {"ex": "s = 'Python'\ns[0] = 'J'", "note": "рядки незмінні", "out": "TypeError: 'str' object does not support item assignment", "err": true, "stdout": "", "warn": []}, {"ex": "len('Київ'), len('Київ'.encode())", "note": "кодові точки проти байтів", "out": "(4, 8)", "err": false, "stdout": "", "warn": []}, {"ex": "name = 'Ann'\nf'{name=}, {3.14159:.2f}, {7:03d}'", "note": "трюки з f-рядками", "out": "\"name='Ann', 3.14, 007\"", "err": false, "stdout": "", "warn": []}, {"ex": "ord('A'), chr(1111)", "note": "кодова точка і назад", "out": "(65, 'ї')", "err": false, "stdout": "", "warn": []}, {"ex": "'Z' < 'a'", "note": "порівняння за кодовими точками", "out": "True", "err": false, "stdout": "", "warn": []}, {"ex": "'5' + 5", "note": "автоматичного перетворення немає", "out": "TypeError: can only concatenate str (not \"int\") to str", "err": true, "stdout": "", "warn": []}, {"ex": "int('5') + 5, '5' + str(5)", "note": "перетворюйте явно", "out": "(10, '55')", "err": false, "stdout": "", "warn": []}]}, "bool": {"title": "bool", "tagline": "True або False. Підклас int, де True == 1, а False == 0.", "literals": ["True", "False", "bool(x)", "1 < 2"], "flags": {"Змінний": false, "Хешований": true, "Впорядкований": null, "Ітерований": false}, "props": [{"t": "Рівно два об'єкти", "d": "True і False — синглтони. `bool(x)` і кожне порівняння повертають один із них, тож `is True` працює, хоча звичний стиль — просто `if flag:`."}, {"t": "Підклас int", "d": "`isinstance(True, int)` дає True, тому `True + True == 2`, а `sum(x > 0 for x in nums)` рахує кількість збігів."}, {"t": "Істинність", "d": "Кожен об'єкт має логічне значення. Хибні: `False`, `None`, `0`, `0.0`, `''`, `[]`, `()`, `{}`, `set()`, `range(0)`. Усе інше істинне, якщо клас не визначає інакше через `__bool__` чи `__len__`."}, {"t": "and / or повертають операнд", "d": "Вони обчислюються скорочено (зупиняються, щойно результат відомий) і повертають один з операндів, не обов'язково bool: `0 or 'default'` дає `'default'`, `'a' and 'b'` дає `'b'`. Лише `not` завжди повертає bool."}, {"t": "Ланцюжки порівнянь", "d": "`1 < x < 10` означає `1 < x and x < 10`, і x обчислюється лише раз."}, {"t": "Такий самий хеш, як в 1 і 0", "d": "`{1: 'one', True: 'yes'}` має лише один ключ, бо `True == 1` і `hash(True) == hash(1)`."}, {"t": "~True застарів", "d": "Побітова інверсія bool дає int (`~True == -2`) і з 3.12 видає DeprecationWarning. Використовуйте `not`."}], "methods_note": "bool успадковує всі методи від int. Вони працюють із 1 та 0.", "methods": [{"name": "bit_length", "sig": "bool.bit_length()", "desc": "Кількість бітів для значення: 1 для True, 0 для False.", "ex": "True.bit_length(), False.bit_length()", "group": null, "out": "(1, 0)", "err": false, "stdout": "", "warn": []}, {"name": "bit_count", "sig": "bool.bit_count()", "desc": "Кількість одиничних бітів: 1 для True, 0 для False.", "ex": "True.bit_count()", "group": null, "out": "1", "err": false, "stdout": "", "warn": []}, {"name": "to_bytes", "sig": "bool.to_bytes(length=1, byteorder='big', *, signed=False)", "desc": "Значення у вигляді bytes.", "ex": "True.to_bytes()", "group": null, "out": "b'\\x01'", "err": false, "stdout": "", "warn": []}, {"name": "from_bytes", "sig": "bool.from_bytes(bytes, byteorder='big', *, signed=False)", "desc": "Метод класу: перетворює байти на int, а потім викликає для нього bool().", "ex": "bool.from_bytes(b'\\x00\\x05')", "group": null, "out": "True", "err": false, "stdout": "", "warn": []}, {"name": "as_integer_ratio", "sig": "bool.as_integer_ratio()", "desc": "Повертає (1, 1) або (0, 1).", "ex": "True.as_integer_ratio()", "group": null, "out": "(1, 1)", "err": false, "stdout": "", "warn": []}, {"name": "is_integer", "sig": "bool.is_integer()", "desc": "Завжди True.", "ex": "False.is_integer()", "group": null, "out": "True", "err": false, "stdout": "", "warn": []}, {"name": "conjugate", "sig": "bool.conjugate()", "desc": "Повертає значення як звичайний int.", "ex": "True.conjugate()", "group": null, "out": "1", "err": false, "stdout": "", "warn": []}, {"name": "real / imag", "sig": "bool.real, bool.imag", "desc": "Атрибути: значення як int і 0.", "ex": "True.real, True.imag", "group": null, "out": "(1, 0)", "err": false, "stdout": "", "warn": []}, {"name": "numerator / denominator", "sig": "bool.numerator, bool.denominator", "desc": "Атрибути: значення як int і 1.", "ex": "True.numerator, True.denominator", "group": null, "out": "(1, 1)", "err": false, "stdout": "", "warn": []}], "ops": [{"ex": "True + True, True * 10", "note": "арифметика як з 1", "out": "(2, 10)", "err": false, "stdout": "", "warn": []}, {"ex": "isinstance(True, int)", "note": "bool — підклас int", "out": "True", "err": false, "stdout": "", "warn": []}, {"ex": "bool(''), bool('0'), bool('False')", "note": "непорожні рядки істинні", "out": "(False, True, True)", "err": false, "stdout": "", "warn": []}, {"ex": "bool([]), bool([0]), bool(None)", "note": "порожня колекція хибна, непорожня — істинна", "out": "(False, True, False)", "err": false, "stdout": "", "warn": []}, {"ex": "0 or 'default'", "note": "or повертає перший істинний операнд", "out": "'default'", "err": false, "stdout": "", "warn": []}, {"ex": "'a' and 'b'", "note": "and повертає останній операнд, якщо всі істинні", "out": "'b'", "err": false, "stdout": "", "warn": []}, {"ex": "[] or None", "note": "обидва хибні — повертається останній", "out": "None", "err": false, "stdout": "", "warn": []}, {"ex": "not [], not 'x'", "note": "not завжди повертає bool", "out": "(True, False)", "err": false, "stdout": "", "warn": []}, {"ex": "x = 5\n1 < x < 10", "note": "ланцюжок порівнянь", "out": "True", "err": false, "stdout": "", "warn": []}, {"ex": "all([1, 'a', [0]]), any([0, '', None])", "note": "чи всі істинні, чи є хоч одне істинне", "out": "(True, False)", "err": false, "stdout": "", "warn": []}, {"ex": "sum(n > 2 for n in [1, 3, 5, 2])", "note": "підрахунок збігів", "out": "2", "err": false, "stdout": "", "warn": []}, {"ex": "{1: 'one', True: 'yes'}", "note": "True і 1 — це один ключ", "out": "{1: 'yes'}", "err": false, "stdout": "", "warn": []}, {"ex": "int(True), str(False)", "note": "перетворення на int і str", "out": "(1, 'False')", "err": false, "stdout": "", "warn": []}]}, "list": {"title": "list", "tagline": "Змінна впорядкована послідовність посилань на об'єкти будь-якого типу.", "literals": ["[]", "[1, 'a', None]", "list('abc')", "[x * x for x in range(5)]"], "flags": {"Змінний": true, "Хешований": false, "Впорядкований": true, "Ітерований": true}, "props": [{"t": "Змінний тип", "d": "Елементи можна додавати, видаляти й замінювати на місці. `id(a)` при цьому не змінюється."}, {"t": "Складність операцій", "d": "Доступ за індексом, `append` і `pop()` — O(1). `insert(0, x)`, `pop(0)` і `x in a` — O(n). Для черги використовуйте `collections.deque`."}, {"t": "Кілька імен для одного списку", "d": "`b = a` — це друге ім'я для того самого списку. `a.copy()`, `a[:]` і `list(a)` створюють поверхневі копії. Для вкладених списків потрібен `copy.deepcopy`."}, {"t": "Пастка [[0] * 3] * 3", "d": "Створює три посилання на один і той самий внутрішній список. Пишіть `[[0] * 3 for _ in range(3)]`."}, {"t": "Не хешований", "d": "Список не може бути ключем словника чи елементом множини. Спершу перетворіть його на кортеж."}, {"t": "Методи, що змінюють список, повертають None", "d": "`a = a.sort()` замінить ваш список на None. Пишіть `a.sort()` або `a = sorted(a)`."}], "methods": [{"name": "append", "sig": "list.append(object)", "desc": "Додає один елемент у кінець. Переданий список додається як один вкладений елемент.", "ex": "a = [1, 2]\na.append([3, 4])\na", "group": null, "out": "[1, 2, [3, 4]]", "err": false, "stdout": "", "warn": []}, {"name": "extend", "sig": "list.extend(iterable)", "desc": "Додає в кінець усі елементи з ітерованого об'єкта.", "ex": "a = [1, 2]\na.extend([3, 4])\na", "group": null, "out": "[1, 2, 3, 4]", "err": false, "stdout": "", "warn": []}, {"name": "insert", "sig": "list.insert(index, object)", "desc": "Вставляє перед заданим індексом. O(n), бо наступні елементи зсуваються.", "ex": "a = ['a', 'c']\na.insert(1, 'b')\na", "group": null, "out": "['a', 'b', 'c']", "err": false, "stdout": "", "warn": []}, {"name": "remove", "sig": "list.remove(value)", "desc": "Видаляє перший елемент, що дорівнює value. Якщо такого немає, викликає ValueError.", "ex": "a = [1, 2, 1]\na.remove(1)\na", "group": null, "out": "[2, 1]", "err": false, "stdout": "", "warn": []}, {"name": "pop", "sig": "list.pop(index=-1)", "desc": "Видаляє й повертає елемент за індексом (за замовчуванням останній). Для порожнього списку викликає IndexError.", "ex": "a = [10, 20, 30]\na.pop(), a.pop(0), a", "group": null, "out": "(30, 10, [20])", "err": false, "stdout": "", "warn": []}, {"name": "clear", "sig": "list.clear()", "desc": "Видаляє всі елементи. Інші імена того самого списку теж бачать його порожнім.", "ex": "a = [1, 2]\nb = a\na.clear()\nb", "group": null, "out": "[]", "err": false, "stdout": "", "warn": []}, {"name": "index", "sig": "list.index(value, start=0, stop=sys.maxsize)", "desc": "Позиція першого елемента, що дорівнює value. Якщо такого немає, викликає ValueError.", "ex": "['a', 'b', 'c'].index('b')", "group": null, "out": "1", "err": false, "stdout": "", "warn": []}, {"name": "count", "sig": "list.count(value)", "desc": "Кількість елементів, що дорівнюють value.", "ex": "[1, 2, 1, 1].count(1)", "group": null, "out": "3", "err": false, "stdout": "", "warn": []}, {"name": "sort", "sig": "list.sort(*, key=None, reverse=False)", "desc": "Сортує на місці й повертає None. Сортування стабільне. Змішані типи, як-от int і str, викликають TypeError.", "ex": "a = ['banana', 'Apple', 'cherry']\na.sort(key=str.lower)\na", "group": null, "out": "['Apple', 'banana', 'cherry']", "err": false, "stdout": "", "warn": []}, {"name": "reverse", "sig": "list.reverse()", "desc": "Розвертає порядок на місці й повертає None.", "ex": "a = [1, 2, 3]\na.reverse()\na", "group": null, "out": "[3, 2, 1]", "err": false, "stdout": "", "warn": []}, {"name": "copy", "sig": "list.copy()", "desc": "Поверхнева копія: новий список із тими самими посиланнями.", "ex": "a = [[1], [2]]\nb = a.copy()\nb[0].append(9)\na", "group": null, "out": "[[1, 9], [2]]", "err": false, "stdout": "", "warn": []}], "ops": [{"ex": "[1, 2] + [3]", "note": "конкатенація, новий список", "out": "[1, 2, 3]", "err": false, "stdout": "", "warn": []}, {"ex": "[0] * 3", "note": "повторення", "out": "[0, 0, 0]", "err": false, "stdout": "", "warn": []}, {"ex": "a = [10, 20, 30, 40]\na[0], a[-1], a[1:3]", "note": "індексація та зрізи", "out": "(10, 40, [20, 30])", "err": false, "stdout": "", "warn": []}, {"ex": "a = [10, 20, 30, 40]\na[1:3] = ['x']\na", "note": "присвоєння зрізу може змінити довжину", "out": "[10, 'x', 40]", "err": false, "stdout": "", "warn": []}, {"ex": "a = [10, 20, 30]\ndel a[0]\na", "note": "видалення за індексом", "out": "[20, 30]", "err": false, "stdout": "", "warn": []}, {"ex": "a = [1, 2]\nb = a\nb.append(3)\na", "note": "два імені, один об'єкт", "out": "[1, 2, 3]", "err": false, "stdout": "", "warn": []}, {"ex": "grid = [[0] * 2] * 2\ngrid[0][0] = 1\ngrid", "note": "пастка спільного рядка", "out": "[[1, 0], [1, 0]]", "err": false, "stdout": "", "warn": []}, {"ex": "sorted([3, 1, 2]), list(reversed([1, 2, 3]))", "note": "нові списки, оригінал не змінюється", "out": "([1, 2, 3], [3, 2, 1])", "err": false, "stdout": "", "warn": []}, {"ex": "min([4, 1, 9]), max([4, 1, 9]), sum([4, 1, 9])", "note": "мінімум, максимум, сума", "out": "(1, 9, 14)", "err": false, "stdout": "", "warn": []}, {"ex": "[n * n for n in range(6) if n % 2 == 0]", "note": "спискове включення (list comprehension)", "out": "[0, 4, 16]", "err": false, "stdout": "", "warn": []}, {"ex": "first, *rest = [1, 2, 3]\nrest", "note": "розпакування", "out": "[2, 3]", "err": false, "stdout": "", "warn": []}, {"ex": "tuple([1, 2]), list((1, 2))", "note": "list ↔ tuple", "out": "((1, 2), [1, 2])", "err": false, "stdout": "", "warn": []}]}, "dict": {"title": "dict", "tagline": "Змінне відображення унікальних хешованих ключів на значення. Пам'ятає порядок додавання.", "literals": ["{}", "{'name': 'Ann', 'age': 30}", "dict(name='Ann')", "{k: v for k, v in pairs}"], "flags": {"Змінний": true, "Хешований": false, "Впорядкований": true, "Ітерований": true}, "props": [{"t": "Хеш-таблиця", "d": "Пошук, додавання й видалення в середньому займають O(1). `key in d` перевіряє ключі, а не значення."}, {"t": "Ключі мають бути хешованими", "d": "Підходять str, int, float, кортежі з хешованих елементів і frozenset. list, dict і set — ні. Значення можуть бути будь-якими."}, {"t": "Ключі унікальні", "d": "Присвоєння за наявним ключем перезаписує значення. `1`, `1.0` і `True` вважаються тим самим ключем."}, {"t": "Порядок додавання", "d": "Гарантований з Python 3.7. Ітерація йде в тому порядку, в якому ключі вперше додали."}, {"t": "Відсутні ключі", "d": "`d['x']` викликає KeyError. Використовуйте `d.get('x')`, `'x' in d`, `setdefault` або `collections.defaultdict`."}, {"t": "Не змінюйте розмір під час ітерації", "d": "Додавання чи видалення ключів усередині `for k in d` викликає RuntimeError. Натомість ітеруйте по `list(d)`."}, {"t": "Живі представлення", "d": "`keys()`, `values()` і `items()` показують і пізніші зміни словника. Це представлення (views), а не копії."}], "methods": [{"name": "get", "sig": "dict.get(key, default=None)", "desc": "Значення для key або default, якщо ключа немає. Ніколи не викликає KeyError.", "ex": "d = {'a': 1}\nd.get('a'), d.get('z'), d.get('z', 0)", "group": null, "out": "(1, None, 0)", "err": false, "stdout": "", "warn": []}, {"name": "keys", "sig": "dict.keys()", "desc": "Живе представлення ключів. Підтримує операції множин, як-от & і -.", "ex": "{'a': 1, 'b': 2}.keys()", "group": null, "out": "dict_keys(['a', 'b'])", "err": false, "stdout": "", "warn": []}, {"name": "values", "sig": "dict.values()", "desc": "Живе представлення значень.", "ex": "{'a': 1, 'b': 2}.values()", "group": null, "out": "dict_values([1, 2])", "err": false, "stdout": "", "warn": []}, {"name": "items", "sig": "dict.items()", "desc": "Живе представлення пар (ключ, значення). Використовуйте в `for k, v in d.items()`.", "ex": "{'a': 1, 'b': 2}.items()", "group": null, "out": "dict_items([('a', 1), ('b', 2)])", "err": false, "stdout": "", "warn": []}, {"name": "update", "sig": "dict.update([other], **kwargs)", "desc": "Додає або перезаписує ключі з іншого словника, з пар (ключ, значення) або з іменованих аргументів.", "ex": "d = {'a': 1, 'b': 2}\nd.update({'b': 20}, c=3)\nd", "group": null, "out": "{'a': 1, 'b': 20, 'c': 3}", "err": false, "stdout": "", "warn": []}, {"name": "pop", "sig": "dict.pop(key[, default])", "desc": "Видаляє key і повертає його значення. Якщо ключа немає і default не задано, викликає KeyError.", "ex": "d = {'a': 1, 'b': 2}\nd.pop('a'), d.pop('z', None), d", "group": null, "out": "(1, None, {'b': 2})", "err": false, "stdout": "", "warn": []}, {"name": "popitem", "sig": "dict.popitem()", "desc": "Видаляє й повертає останню додану пару (ключ, значення). Для порожнього словника викликає KeyError.", "ex": "d = {'a': 1, 'b': 2}\nd.popitem(), d", "group": null, "out": "(('b', 2), {'a': 1})", "err": false, "stdout": "", "warn": []}, {"name": "setdefault", "sig": "dict.setdefault(key, default=None)", "desc": "Повертає значення для key. Якщо ключа немає, спершу додає його зі значенням default.", "ex": "d = {}\nd.setdefault('fruits', []).append('apple')\nd", "group": null, "out": "{'fruits': ['apple']}", "err": false, "stdout": "", "warn": []}, {"name": "clear", "sig": "dict.clear()", "desc": "Видаляє всі елементи.", "ex": "d = {'a': 1}\nd.clear()\nd", "group": null, "out": "{}", "err": false, "stdout": "", "warn": []}, {"name": "copy", "sig": "dict.copy()", "desc": "Поверхнева копія: новий словник, ті самі об'єкти-значення.", "ex": "d = {'tags': ['x']}\nc = d.copy()\nc['tags'].append('y')\nd", "group": null, "out": "{'tags': ['x', 'y']}", "err": false, "stdout": "", "warn": []}, {"name": "fromkeys", "sig": "dict.fromkeys(iterable, value=None)", "desc": "Метод класу: новий словник із заданими ключами, усі зі значенням value. Усі ключі ділять один і той самий об'єкт-значення.", "ex": "dict.fromkeys(['a', 'b'], 0)", "group": null, "out": "{'a': 0, 'b': 0}", "err": false, "stdout": "", "warn": []}], "ops": [{"ex": "d = {'name': 'Ann'}\nd['age'] = 30\nd", "note": "додати або перезаписати", "out": "{'name': 'Ann', 'age': 30}", "err": false, "stdout": "", "warn": []}, {"ex": "d = {'name': 'Ann'}\nd['email']", "note": "відсутній ключ", "out": "KeyError: 'email'", "err": true, "stdout": "", "warn": []}, {"ex": "d = {'a': 1, 'b': 2}\ndel d['a']\nd", "note": "видалення ключа", "out": "{'b': 2}", "err": false, "stdout": "", "warn": []}, {"ex": "'a' in {'a': 1}, 1 in {'a': 1}", "note": "in перевіряє ключі", "out": "(True, False)", "err": false, "stdout": "", "warn": []}, {"ex": "{'a': 1} | {'b': 2, 'a': 9}", "note": "злиття, перемагає правий бік (3.9+)", "out": "{'a': 9, 'b': 2}", "err": false, "stdout": "", "warn": []}, {"ex": "{**{'a': 1}, **{'b': 2}}", "note": "злиття через розпакування", "out": "{'a': 1, 'b': 2}", "err": false, "stdout": "", "warn": []}, {"ex": "{n: n * n for n in range(4)}", "note": "словникове включення (dict comprehension)", "out": "{0: 0, 1: 1, 2: 4, 3: 9}", "err": false, "stdout": "", "warn": []}, {"ex": "list({'b': 1, 'a': 2})", "note": "ітерація дає ключі в порядку додавання", "out": "['b', 'a']", "err": false, "stdout": "", "warn": []}, {"ex": "{1: 'int', 1.0: 'float', True: 'bool'}", "note": "рівні ключі зливаються в один", "out": "{1: 'bool'}", "err": false, "stdout": "", "warn": []}, {"ex": "{[1, 2]: 'x'}", "note": "список не хешований", "out": "TypeError: cannot use 'list' as a dict key (unhashable type: 'list')", "err": true, "stdout": "", "warn": []}, {"ex": "{(50.45, 30.52): 'Kyiv'}", "note": "кортеж годиться як ключ", "out": "{(50.45, 30.52): 'Kyiv'}", "err": false, "stdout": "", "warn": []}, {"ex": "d = {'a': 1, 'b': 2}\nfor k in d:\n    del d[k]", "note": "зміна розміру під час ітерації", "out": "RuntimeError: dictionary changed size during iteration", "err": true, "stdout": "", "warn": []}]}, "tuple": {"title": "tuple", "tagline": "Незмінна впорядкована послідовність посилань. Фіксований набір значень.", "literals": ["()", "(1,)", "1, 2, 3", "tuple([1, 2])"], "flags": {"Змінний": false, "Хешований": "якщо елементи хешовані", "Впорядкований": true, "Ітерований": true}, "props": [{"t": "Незмінний контейнер", "d": "Елементи не можна додавати, видаляти чи замінювати. Але самі елементи можуть бути змінними: у `t = ([1], 2)` виклик `t[0].append(3)` спрацює."}, {"t": "Кортеж створює кома", "d": "`(5)` — це просто int у дужках. `(5,)` і `5,` — кортежі."}, {"t": "Хешований, якщо всі елементи хешовані", "d": "`(1, 'a')` може бути ключем словника чи елементом множини. Виклик `hash(([1],))` викликає TypeError."}, {"t": "Пакування та розпакування", "d": "`x, y = y, x` міняє значення місцями. `a, *rest = t` збирає залишок. Функції повертають кілька значень як кортеж."}], "methods": [{"name": "count", "sig": "tuple.count(value)", "desc": "Кількість елементів, що дорівнюють value.", "ex": "(1, 2, 2, 3, 2).count(2)", "group": null, "out": "3", "err": false, "stdout": "", "warn": []}, {"name": "index", "sig": "tuple.index(value, start=0, stop=sys.maxsize)", "desc": "Позиція першого елемента, що дорівнює value. Якщо такого немає, викликає ValueError.", "ex": "('a', 'b', 'c').index('c')", "group": null, "out": "2", "err": false, "stdout": "", "warn": []}], "ops": [{"ex": "type((5)), type((5,))", "note": "кома має значення", "out": "(<class 'int'>, <class 'tuple'>)", "err": false, "stdout": "", "warn": []}, {"ex": "t = 1, 2, 3\nt", "note": "пакування без дужок", "out": "(1, 2, 3)", "err": false, "stdout": "", "warn": []}, {"ex": "t = (10, 20, 30)\nt[0], t[-1], t[1:]", "note": "індексація та зрізи", "out": "(10, 30, (20, 30))", "err": false, "stdout": "", "warn": []}, {"ex": "t = (10, 20, 30)\nt[0] = 99", "note": "кортеж незмінний", "out": "TypeError: 'tuple' object does not support item assignment", "err": true, "stdout": "", "warn": []}, {"ex": "t = ([1], 2)\nt[0].append(3)\nt", "note": "внутрішній список усе ще можна змінити", "out": "([1, 3], 2)", "err": false, "stdout": "", "warn": []}, {"ex": "x, y = 1, 2\nx, y = y, x\nx, y", "note": "обмін значеннями", "out": "(2, 1)", "err": false, "stdout": "", "warn": []}, {"ex": "first, *rest = (1, 2, 3, 4)\nrest", "note": "ім'я із зірочкою завжди отримує список", "out": "[2, 3, 4]", "err": false, "stdout": "", "warn": []}, {"ex": "(1, 2) + (3,), (0,) * 3", "note": "конкатенація та повторення", "out": "((1, 2, 3), (0, 0, 0))", "err": false, "stdout": "", "warn": []}, {"ex": "hash((1, 'a')) == hash((1, 'a'))", "note": "хешований", "out": "True", "err": false, "stdout": "", "warn": []}, {"ex": "hash(([1],))", "note": "усередині є не хешований елемент", "out": "TypeError: unhashable type: 'list'", "err": true, "stdout": "", "warn": []}, {"ex": "divmod(17, 5)", "note": "функції повертають кортежі", "out": "(3, 2)", "err": false, "stdout": "", "warn": []}, {"ex": "(1, 2, 3) < (1, 3)", "note": "порівняння поелементно", "out": "True", "err": false, "stdout": "", "warn": []}]}, "set": {"title": "set", "tagline": "Змінна невпорядкована колекція унікальних хешованих елементів. Швидка перевірка належності та операції над множинами.", "literals": ["{1, 2, 3}", "set()", "set('hello')", "{x % 3 for x in range(10)}", "frozenset({1, 2})"], "flags": {"Змінний": true, "Хешований": false, "Впорядкований": false, "Ітерований": true}, "props": [{"t": "Унікальні елементи", "d": "Дублікати відкидаються автоматично. `list(set(items))` прибирає дублікати, але втрачає порядок. `list(dict.fromkeys(items))` його зберігає."}, {"t": "Невпорядкована", "d": "Ні індексації, ні зрізів. Порядок ітерації — деталь реалізації: малі цілі числа часто виглядають відсортованими, а рядки змінюють порядок між запусками через рандомізацію хешів."}, {"t": "{} — це не множина", "d": "`{}` створює порожній словник. Порожня множина записується як `set()`."}, {"t": "Елементи мають бути хешованими", "d": "Елементами можуть бути числа, рядки й кортежі. Списки, словники й множини — ні. Сама множина не хешована; `frozenset` — її незмінна хешована версія."}, {"t": "Перевірка належності за O(1)", "d": "`x in s` займає приблизно однаковий час і для 10 елементів, і для 10 мільйонів. `x in some_list` перевіряє елементи по одному."}, {"t": "Методи приймають будь-який ітерований об'єкт", "d": "`s.union([4, 5])` працює, а `s | [4, 5]` викликає TypeError, бо операторам потрібні множини з обох боків."}], "methods": [{"name": "add", "sig": "set.add(elem)", "desc": "Додає один елемент. Якщо він уже є, нічого не робить.", "ex": "s = {1, 2}\ns.add(2)\ns.add(3)\ns", "group": "Зміна", "out": "{1, 2, 3}", "err": false, "stdout": "", "warn": []}, {"name": "update", "sig": "set.update(*others)", "desc": "Додає всі елементи з одного чи кількох ітерованих об'єктів. Версія union на місці (|=).", "ex": "s = {1}\ns.update([2, 3], (3, 4))\ns", "group": "Зміна", "out": "{1, 2, 3, 4}", "err": false, "stdout": "", "warn": []}, {"name": "remove", "sig": "set.remove(elem)", "desc": "Видаляє елемент. Якщо його немає, викликає KeyError.", "ex": "s = {1, 2}\ns.remove(5)", "group": "Зміна", "out": "KeyError: 5", "err": true, "stdout": "", "warn": []}, {"name": "discard", "sig": "set.discard(elem)", "desc": "Видаляє елемент, якщо він є. Помилки не буває.", "ex": "s = {1, 2}\ns.discard(5)\ns", "group": "Зміна", "out": "{1, 2}", "err": false, "stdout": "", "warn": []}, {"name": "pop", "sig": "set.pop()", "desc": "Видаляє й повертає довільний елемент. Для порожньої множини викликає KeyError.", "ex": "s = {7, 8, 9}\ns.pop(), s", "group": "Зміна", "out": "(8, {9, 7})", "err": false, "stdout": "", "warn": []}, {"name": "clear", "sig": "set.clear()", "desc": "Видаляє всі елементи.", "ex": "s = {1, 2}\ns.clear()\ns", "group": "Зміна", "out": "set()", "err": false, "stdout": "", "warn": []}, {"name": "copy", "sig": "set.copy()", "desc": "Поверхнева копія.", "ex": "{1, 2}.copy()", "group": "Зміна", "out": "{1, 2}", "err": false, "stdout": "", "warn": []}, {"name": "union", "sig": "set.union(*others)", "desc": "Нова множина з елементами всіх множин (|).", "ex": "{1, 2}.union([2, 3], [4])", "group": "Об'єднання та перетин", "out": "{1, 2, 3, 4}", "err": false, "stdout": "", "warn": []}, {"name": "intersection", "sig": "set.intersection(*others)", "desc": "Нова множина з елементами, спільними для всіх (&).", "ex": "{1, 2, 3}.intersection([2, 3, 4])", "group": "Об'єднання та перетин", "out": "{2, 3}", "err": false, "stdout": "", "warn": []}, {"name": "difference", "sig": "set.difference(*others)", "desc": "Нова множина з елементами, яких немає в інших (-).", "ex": "{1, 2, 3}.difference([2])", "group": "Об'єднання та перетин", "out": "{1, 3}", "err": false, "stdout": "", "warn": []}, {"name": "symmetric_difference", "sig": "set.symmetric_difference(other)", "desc": "Нова множина з елементами, що є рівно в одній із двох (^).", "ex": "{1, 2, 3}.symmetric_difference([3, 4])", "group": "Об'єднання та перетин", "out": "{1, 2, 4}", "err": false, "stdout": "", "warn": []}, {"name": "intersection_update", "sig": "set.intersection_update(*others)", "desc": "Лишає тільки елементи, що є в усіх (&=).", "ex": "s = {1, 2, 3}\ns.intersection_update([2, 3, 4])\ns", "group": "Об'єднання та перетин", "out": "{2, 3}", "err": false, "stdout": "", "warn": []}, {"name": "difference_update", "sig": "set.difference_update(*others)", "desc": "Видаляє елементи, що є в інших (-=).", "ex": "s = {1, 2, 3}\ns.difference_update([1])\ns", "group": "Об'єднання та перетин", "out": "{2, 3}", "err": false, "stdout": "", "warn": []}, {"name": "symmetric_difference_update", "sig": "set.symmetric_difference_update(other)", "desc": "Лишає елементи, що є рівно в одній із двох (^=).", "ex": "s = {1, 2, 3}\ns.symmetric_difference_update([3, 4])\ns", "group": "Об'єднання та перетин", "out": "{1, 2, 4}", "err": false, "stdout": "", "warn": []}, {"name": "issubset", "sig": "set.issubset(other)", "desc": "True, якщо кожен елемент є і в other (<=).", "ex": "{1, 2}.issubset([1, 2, 3])", "group": "Порівняння", "out": "True", "err": false, "stdout": "", "warn": []}, {"name": "issuperset", "sig": "set.issuperset(other)", "desc": "True, якщо кожен елемент other є в цій множині (>=).", "ex": "{1, 2, 3}.issuperset([1, 2])", "group": "Порівняння", "out": "True", "err": false, "stdout": "", "warn": []}, {"name": "isdisjoint", "sig": "set.isdisjoint(other)", "desc": "True, якщо дві множини не мають спільних елементів.", "ex": "{1, 2}.isdisjoint([3, 4])", "group": "Порівняння", "out": "True", "err": false, "stdout": "", "warn": []}], "ops": [{"ex": "set([3, 1, 3, 2, 1])", "note": "дублікати прибрано", "out": "{1, 2, 3}", "err": false, "stdout": "", "warn": []}, {"ex": "type({}), type(set())", "note": "{} — це словник", "out": "(<class 'dict'>, <class 'set'>)", "err": false, "stdout": "", "warn": []}, {"ex": "a, b = {1, 2, 3}, {3, 4}\na | b, a & b, a - b, a ^ b", "note": "об'єднання, перетин, різниця, симетрична різниця", "out": "({1, 2, 3, 4}, {3}, {1, 2}, {1, 2, 4})", "err": false, "stdout": "", "warn": []}, {"ex": "{1, 2} <= {1, 2, 3}, {1, 2} < {1, 2}", "note": "підмножина, власна підмножина", "out": "(True, False)", "err": false, "stdout": "", "warn": []}, {"ex": "3 in {1, 2, 3}", "note": "перевірка належності за O(1)", "out": "True", "err": false, "stdout": "", "warn": []}, {"ex": "sorted(set('hello'))", "note": "унікальні літери, відсортовані для стабільного результату", "out": "['e', 'h', 'l', 'o']", "err": false, "stdout": "", "warn": []}, {"ex": "{1, 2}[0]", "note": "індексації немає", "out": "TypeError: 'set' object is not subscriptable", "err": true, "stdout": "", "warn": ["SyntaxWarning: 'set' object is not subscriptable; perhaps you missed a comma?"]}, {"ex": "{1, 2} | [3]", "note": "операторам потрібні множини з обох боків", "out": "TypeError: unsupported operand type(s) for |: 'set' and 'list'", "err": true, "stdout": "", "warn": []}, {"ex": "{[1, 2]}", "note": "елементи мають бути хешованими", "out": "TypeError: cannot use 'list' as a set element (unhashable type: 'list')", "err": true, "stdout": "", "warn": []}, {"ex": "{frozenset({1, 2}): 'pair'}", "note": "frozenset хешований", "out": "{frozenset({1, 2}): 'pair'}", "err": false, "stdout": "", "warn": []}, {"ex": "{n % 3 for n in range(10)}", "note": "множинне включення (set comprehension)", "out": "{0, 1, 2}", "err": false, "stdout": "", "warn": []}, {"ex": "list(dict.fromkeys([3, 1, 3, 2]))", "note": "прибрати дублікати й зберегти порядок", "out": "[3, 1, 2]", "err": false, "stdout": "", "warn": []}]}}, "version": "3.14.3"};
+
+/* ---------- helpers ---------- */
+const $ = (s, el = document) => el.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const md = s => esc(s).replace(/`([^`]+)`/g, "<code>$1</code>");
+const fmt = n => n.toLocaleString("en-US");
+
+const KW = new Set("False None True and as assert break class continue def del elif else except finally for from global if import in is lambda nonlocal not or pass raise return try while with yield".split(" "));
+const BI = new Set("abs all any bin bool chr dict divmod frozenset hash hex id int isinstance len list max min oct ord pow print range repr reversed round set sorted str sum tuple type".split(" "));
+function hl(code) {
+  const re = /(#[^\n]*)|([rbfRBF]{0,2}(?:'''[\s\S]*?'''|"""[\s\S]*?"""|'(?:\\.|[^'\\\n])*'|"(?:\\.|[^"\\\n])*"))|(\b\d[\d_]*(?:\.\d+)?\b)|([A-Za-z_][A-Za-z0-9_]*)/g;
+  let out = "", last = 0, m;
+  while ((m = re.exec(code))) {
+    out += esc(code.slice(last, m.index));
+    const [t, com, str, num, id] = m;
+    if (com) out += `<span class="tk-c">${esc(t)}</span>`;
+    else if (str) out += `<span class="tk-s">${esc(t)}</span>`;
+    else if (num) out += `<span class="tk-n">${esc(t)}</span>`;
+    else if (KW.has(id)) out += `<span class="tk-k">${esc(t)}</span>`;
+    else if (BI.has(id) && code[m.index - 1] !== ".") out += `<span class="tk-b">${esc(t)}</span>`;
+    else out += esc(t);
+    last = m.index + t.length;
+  }
+  return out + esc(code.slice(last));
+}
+function cell(item) {
+  const warn = (item.warn || []).filter(w => !w.startsWith("SyntaxWarning"));
+  return `<div class="cell">
+    <pre>${hl(item.ex)}</pre>
+    ${item.stdout ? `<div class="stdout">${esc(item.stdout.trimEnd())}</div>` : ""}
+    <div class="res${item.err ? " err" : ""}">${item.err ? esc(item.out) : hl(item.out)}</div>
+    ${warn.length ? `<div class="note">${esc(warn.join("; "))}</div>` : ""}
+    ${item.note ? `<div class="note">${esc(item.note)}</div>` : ""}
+  </div>`;
+}
+
+/* ---------- extra sections ---------- */
+const EXTRA = { bool: () => `
+    <section class="s"><div class="s-h"><h2>Таблиця істинності</h2><span class="sub">Булева алгебра: and, or, not і xor (!=)</span></div>
+    <div class="tbl-scroll"><table class="t truth" style="max-width:640px">
+      <thead><tr><th>A</th><th>B</th><th>A and B</th><th>A or B</th><th>not A</th><th>A != B (xor)</th></tr></thead>
+      <tbody>${[[true, true], [true, false], [false, true], [false, false]].map(([a, b]) =>
+        `<tr>${[a, b, a && b, a || b, !a, a !== b].map(v => `<td class="${v ? "y" : "x"}">${v ? "True" : "False"}</td>`).join("")}</tr>`).join("")}</tbody>
+    </table></div>
+    <p style="color:var(--muted);font-size:14px;max-width:70ch">Хибні значення: <code>False</code> <code>None</code> <code>0</code> <code>0.0</code> <code>''</code> <code>[]</code> <code>()</code> <code>{}</code> <code>set()</code> <code>range(0)</code>. Усе інше істинне, зокрема <code>'0'</code>, <code>'False'</code>, <code>[0]</code> і <code>-1</code>.</p>
+    </section>` };
+
+/* ---------- compare tab ---------- */
+const COMPARE = [
+  ["int", "42", "ні", "так", "—", "ні", 28, "лічба, індекси, ідентифікатори"],
+  ["None", "None", "ні", "так", "—", "ні", 16, "відсутнє значення, аргумент за замовчуванням"],
+  ["str", "'hi'", "ні", "так", "так", "так", 41, "текст"],
+  ["bool", "True", "ні", "так", "—", "ні", 28, "прапорці, умови"],
+  ["list", "[1, 2]", "так", "ні", "так", "так", 56, "впорядкована колекція, яка може зростати"],
+  ["dict", "{'k': 1}", "так", "ні", "за додаванням", "за ключем", 64, "пошук за ключем, записи"],
+  ["tuple", "(1, 2)", "ні", "якщо елементи хешовані", "так", "так", 48, "фіксовані записи, ключі словника"],
+  ["set", "{1, 2}", "так", "ні", "ні", "ні", 216, "унікальність, швидка перевірка належності"],
+];
+
+/* ---------- build ---------- */
+const TABS = [...DATA.order, "Compare"];
+const tablist = $("#tablist"), panels = $("#panels");
+$("#ver").textContent = `CPython ${DATA.version}`;
+$("#ver2").textContent = DATA.version;
+
+function flagHtml(flags) {
+  return `<div class="flags">${Object.entries(flags).map(([k, v]) => {
+    const txt = v === true ? "так" : v === false ? "ні" : v === null ? "—" : v;
+    return `<span class="flag"><b>${k}</b><span class="${v === true ? "yes" : "no"}">${esc(txt)}</span></span>`;
+  }).join("")}</div>`;
+}
+
+function methodsHtml(tab, key) {
+  if (!tab.methods.length) return `<p class="m-empty">${esc(tab.no_methods)}</p>`;
+  let html = tab.methods_note ? `<p class="m-note">${esc(tab.methods_note)}</p>` : "", group = null;
+  for (const m of tab.methods) {
+    if (m.group && m.group !== group) { group = m.group; html += `<div class="m-group" data-g="${esc(group)}">${esc(group)}</div>`; }
+    html += `<div class="m-row" data-q="${esc((m.name + " " + m.desc).toLowerCase())}" data-g="${esc(m.group || "")}">
+      <div><div class="m-name">.${esc(m.name)}${m.sig.includes("(") ? "()" : ""}</div><div class="m-sig">${esc(m.sig)}</div></div>
+      <div class="m-desc">${md(m.desc)}</div>
+      ${cell(m)}</div>`;
+  }
+  return html;
+}
+
+function buildPanel(key) {
+  const p = document.createElement("div");
+  p.className = "panel"; p.id = "panel-" + key; p.setAttribute("role", "tabpanel"); p.setAttribute("aria-labelledby", "tab-" + key); p.hidden = true;
+  if (key === "Compare") {
+    p.innerHTML = `<div class="p-head"><div class="p-name" style="font-family:var(--font-display)">Порівняння</div><div><p class="p-tag">Усі вісім типів поруч.</p></div></div>
+      <section class="s"><div class="tbl-scroll"><table class="t">
+      <thead><tr><th>Тип</th><th>Літерал</th><th>Змінний</th><th>Хешований</th><th>Впорядкований</th><th>Індексація</th><th>Для чого</th></tr></thead>
+      <tbody>${COMPARE.map(r => `<tr><td><a href="#${r[0]}" data-go="${r[0]}"><code>${r[0]}</code></a></td><td><code>${esc(r[1])}</code></td>${r.slice(2, 6).map(v => `<td class="${v === "так" ? "y" : "x"}">${esc(v)}</td>`).join("")}<td>${esc(r[7])}</td></tr>`).join("")}</tbody></table></div>
+      <p style="color:var(--muted);font-size:14px;max-width:72ch;margin-top:14px">Просте правило: хешованими бувають лише незмінні значення, і лише хешовані значення можуть бути ключами словника чи елементами множини. Кортеж хешований, тільки якщо хешоване все, що в ньому.</p></section>`;
+    p.querySelectorAll("[data-go]").forEach(a => a.addEventListener("click", e => { e.preventDefault(); select(a.dataset.go, true); }));
+    return p;
+  }
+  const tab = DATA.tabs[key];
+  p.innerHTML = `
+    <div class="p-head">
+      <div class="p-name">${esc(tab.title)}</div>
+      <div><p class="p-tag">${md(tab.tagline)}</p>
+        <div class="chips">${tab.literals.map(l => `<span class="chip">${esc(l)}</span>`).join("")}</div>
+        ${flagHtml(tab.flags)}</div>
+    </div>
+    ${EXTRA[key] ? EXTRA[key]() : ""}
+    <section class="s"><div class="s-h"><h2>Ключові властивості</h2></div>
+      <div class="props">${tab.props.map(pr => `<div class="prop"><h3>${esc(pr.t)}</h3><p>${md(pr.d)}</p></div>`).join("")}</div></section>
+    <section class="s"><div class="s-h"><h2>Методи</h2><span class="sub">${tab.methods.length ? "публічних: " + tab.methods.length : "немає"}</span><span class="grow"></span>
+      ${tab.methods.length > 6 ? `<input class="filter" id="f-${key}" type="search" placeholder="Пошук методу" aria-label="Пошук методів ${esc(key)}">` : ""}</div>
+      <div class="m-list">${methodsHtml(tab, key)}</div></section>
+    <section class="s"><div class="s-h"><h2>Операції та підводні камені</h2><span class="sub">реальні результати з Python ${DATA.version}</span></div>
+      <div class="ops">${tab.ops.map(cell).join("")}</div></section>`;
+  const f = $(".filter", p);
+  if (f) f.addEventListener("input", () => {
+    const q = f.value.trim().toLowerCase();
+    const rows = p.querySelectorAll(".m-row");
+    rows.forEach(r => r.hidden = q && !r.dataset.q.includes(q));
+    p.querySelectorAll(".m-group").forEach(g => g.hidden = ![...rows].some(r => r.dataset.g === g.dataset.g && !r.hidden));
+  });
+  return p;
+}
+
+const MUT = { list: true, dict: true, set: true };
+TABS.forEach(key => {
+  const b = document.createElement("button");
+  b.className = "tab" + (key === "Compare" ? " compare" : "");
+  b.id = "tab-" + key; b.setAttribute("role", "tab"); b.setAttribute("aria-controls", "panel-" + key); b.tabIndex = -1;
+  b.innerHTML = key === "Compare" ? "Порівняння" : `<i class="dot${MUT[key] ? " mut" : ""}" aria-hidden="true"></i>${esc(key)}`;
+  b.title = key === "Compare" ? "Усі типи поруч" : (MUT[key] ? "змінний" : "незмінний");
+  b.addEventListener("click", () => select(key, true));
+  tablist.appendChild(b);
+  panels.appendChild(buildPanel(key));
+});
+tablist.addEventListener("keydown", e => {
+  const i = TABS.indexOf(document.activeElement.id.replace("tab-", ""));
+  if (i < 0) return;
+  let j = null;
+  if (e.key === "ArrowRight") j = (i + 1) % TABS.length;
+  if (e.key === "ArrowLeft") j = (i - 1 + TABS.length) % TABS.length;
+  if (e.key === "Home") j = 0;
+  if (e.key === "End") j = TABS.length - 1;
+  if (j !== null) { e.preventDefault(); select(TABS[j], true); $("#tab-" + TABS[j]).focus(); }
+});
+
+function select(key, user) {
+  if (!TABS.includes(key)) key = TABS[0];
+  TABS.forEach(k => {
+    const on = k === key;
+    const b = $("#tab-" + k); b.setAttribute("aria-selected", on); b.tabIndex = on ? 0 : -1;
+    $("#panel-" + k).hidden = !on;
+  });
+  if (user) {
+    try { localStorage.setItem("pytypes-tab", key); } catch (e) {}
+    try { history.replaceState(null, "", "#" + key); } catch (e) {}
+    const tabs = $(".tabs");
+    if (tabs.getBoundingClientRect().top <= 1) window.scrollTo({ top: tabs.offsetTop, behavior: "instant" });
+    $("#tab-" + key).scrollIntoView({ block: "nearest", inline: "nearest" });
+  }
+}
+let initial = location.hash.slice(1);
+if (!TABS.includes(initial)) { try { initial = localStorage.getItem("pytypes-tab") || ""; } catch (e) { initial = ""; } }
+select(TABS.includes(initial) ? initial : TABS[0], false);
+window.addEventListener("hashchange", () => select(location.hash.slice(1), false));
+</script>
+</body>
+</html>

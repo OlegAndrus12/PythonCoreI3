@@ -8,38 +8,38 @@
 
   body {
     font-family: "JetBrains Mono", "Fira Code", monospace;
-    background: #1e1e2e;
-    color: #cdd6f4;
+    background: #f5f6f8;
+    color: #4c4f69;
     min-height: 100vh;
     padding: 24px;
   }
 
-  h1 { font-size: 18px; font-weight: 600; color: #cba6f7; margin-bottom: 4px; }
-  .subtitle { font-size: 12px; color: #6c7086; margin-bottom: 24px; }
+  h1 { font-size: 18px; font-weight: 600; color: #8839ef; margin-bottom: 4px; }
+  .subtitle { font-size: 12px; color: #6c6f85; margin-bottom: 24px; }
 
   .repl {
     display: flex;
     align-items: center;
-    background: #181825;
-    border: 1px solid #313244;
+    background: #ffffff;
+    border: 1px solid #dce0e8;
     border-radius: 8px;
     padding: 10px 14px;
     margin-bottom: 12px;
     gap: 8px;
   }
-  .repl-prompt { color: #cba6f7; font-size: 14px; user-select: none; }
+  .repl-prompt { color: #8839ef; font-size: 14px; user-select: none; }
   .repl-input {
     flex: 1;
     background: transparent;
     border: none;
     outline: none;
-    color: #cdd6f4;
+    color: #4c4f69;
     font-family: inherit;
     font-size: 14px;
-    caret-color: #cba6f7;
+    caret-color: #8839ef;
   }
-  .repl-hint { font-size: 11px; color: #45475a; margin-bottom: 10px; padding-left: 4px; }
-  .repl-hint span { color: #6c7086; }
+  .repl-hint { font-size: 11px; color: #9ca0b0; margin-bottom: 10px; padding-left: 4px; }
+  .repl-hint span { color: #6c6f85; }
 
   /* Command history */
   .cmd-history {
@@ -53,25 +53,25 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    background: #181825;
-    border: 1px solid #313244;
+    background: #ffffff;
+    border: 1px solid #dce0e8;
     border-radius: 5px;
     padding: 4px 10px;
     font-size: 12px;
     animation: fadeIn 0.15s ease;
   }
-  .cmd-entry .cmd-prompt { color: #45475a; user-select: none; }
-  .cmd-entry .cmd-text   { color: #89b4fa; }
-  .cmd-entry .cmd-text.is-del    { color: #f38ba8; }
-  .cmd-entry .cmd-text.is-gc     { color: #a6e3a1; }
-  .cmd-entry .cmd-text.is-inspect{ color: #f9e2af; }
+  .cmd-entry .cmd-prompt { color: #9ca0b0; user-select: none; }
+  .cmd-entry .cmd-text   { color: #1e66f5; }
+  .cmd-entry .cmd-text.is-del    { color: #d20f39; }
+  .cmd-entry .cmd-text.is-gc     { color: #2e7d1f; }
+  .cmd-entry .cmd-text.is-inspect{ color: #a6620c; }
 
   .gc-btn {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    background: #a6e3a1;
-    color: #1e1e2e;
+    background: #40a02b;
+    color: #ffffff;
     border: none;
     border-radius: 6px;
     padding: 6px 14px;
@@ -87,8 +87,8 @@
   .toast {
     position: fixed;
     bottom: 24px; left: 50%; transform: translateX(-50%);
-    background: #f38ba8;
-    color: #1e1e2e;
+    background: #d20f39;
+    color: #ffffff;
     padding: 8px 18px;
     border-radius: 6px;
     font-size: 13px;
@@ -104,15 +104,15 @@
   .arena { display: grid; grid-template-columns: 220px 1fr; min-height: 460px; }
 
   .vars-panel {
-    background: #181825;
+    background: #ffffff;
     border-radius: 10px 0 0 10px;
-    border: 1px solid #313244;
+    border: 1px solid #dce0e8;
     border-right: none;
     padding: 16px;
   }
   .panel-title {
     font-size: 11px;
-    color: #6c7086;
+    color: #6c6f85;
     text-transform: uppercase;
     letter-spacing: 0.08em;
     margin-bottom: 14px;
@@ -121,7 +121,7 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    background: #313244;
+    background: #eef0f4;
     border-radius: 6px;
     padding: 8px 10px;
     margin-bottom: 8px;
@@ -129,24 +129,24 @@
     animation: fadeIn 0.2s ease;
     transition: background 0.15s, outline 0.15s;
   }
-  .var-name  { color: #89b4fa; font-weight: 600; }
-  .var-arrow { color: #6c7086; margin: 0 6px; }
-  .var-addr  { color: #fab387; font-size: 11px; }
+  .var-name  { color: #1e66f5; font-weight: 600; }
+  .var-arrow { color: #8c8fa1; margin: 0 6px; }
+  .var-addr  { color: #c2410c; font-size: 11px; }
   .var-item.highlighted {
-    background: #45475a;
-    outline: 2px solid #cba6f7;
+    background: #ece4fd;
+    outline: 2px solid #8839ef;
     outline-offset: -1px;
   }
 
   .heap-panel {
-    background: #1e1e2e;
+    background: #fafbfc;
     border-radius: 0 10px 10px 0;
-    border: 1px solid #313244;
+    border: 1px solid #dce0e8;
     padding: 16px;
   }
   .heap-inner {
-    background: #181825;
-    border: 2px dashed #313244;
+    background: #ffffff;
+    border: 2px dashed #ccd0da;
     border-radius: 8px;
     min-height: 400px;
     padding: 16px;
@@ -159,34 +159,35 @@
   .heap-label {
     position: absolute;
     bottom: 8px; right: 12px;
-    font-size: 11px; color: #313244;
+    font-size: 11px; color: #bcc0cc;
     text-transform: uppercase; letter-spacing: 0.08em;
   }
 
   /* Object cards */
   .obj-card {
-    background: #313244;
-    border: 1px solid #45475a;
+    background: #f7f8fa;
+    border: 1px solid #d4d8e1;
     border-radius: 8px;
     padding: 10px 14px;
     min-width: 148px;
     animation: fadeIn 0.2s ease;
     transition: outline 0.1s;
+    box-shadow: 0 1px 2px rgba(76,79,105,.06);
   }
-  .obj-card.gc-pending { border-color: #f38ba8; animation: pulse 0.6s ease infinite alternate; }
-  .obj-card.interned   { border-color: #f9e2af; }
+  .obj-card.gc-pending { border-color: #d20f39; animation: pulse 0.6s ease infinite alternate; }
+  .obj-card.interned   { border-color: #df8e1d; }
   .obj-card.list-card  { min-width: 200px; }
-  .obj-card.slot-highlight { outline: 2px solid #89b4fa; outline-offset: 1px; }
+  .obj-card.slot-highlight { outline: 2px solid #1e66f5; outline-offset: 1px; }
 
   .obj-field { display: flex; justify-content: space-between; font-size: 12px; padding: 2px 0; gap: 16px; }
-  .fk { color: #6c7086; }
-  .fv { color: #cdd6f4; font-weight: 500; }
-  .fv.type  { color: #89dceb; }
-  .fv.value { color: #a6e3a1; }
-  .fv.addr  { color: #fab387; font-size: 11px; }
-  .fv.refc  { color: #f9e2af; }
-  .fv.refc.zero { color: #f38ba8; }
-  hr.div { border: none; border-top: 1px solid #45475a; margin: 6px 0; }
+  .fk { color: #6c6f85; }
+  .fv { color: #4c4f69; font-weight: 500; }
+  .fv.type  { color: #0478a8; }
+  .fv.value { color: #2e7d1f; }
+  .fv.addr  { color: #c2410c; font-size: 11px; }
+  .fv.refc  { color: #a6620c; }
+  .fv.refc.zero { color: #d20f39; }
+  hr.div { border: none; border-top: 1px solid #dce0e8; margin: 6px 0; }
 
   /* List slots */
   .list-slots { margin: 4px 0 2px; }
@@ -200,17 +201,17 @@
     cursor: default;
     transition: background 0.1s;
   }
-  .list-slot:hover { background: #45475a; }
-  .slot-idx   { color: #6c7086; min-width: 22px; }
-  .slot-sep   { color: #45475a; }
-  .slot-tval  { color: #a6e3a1; }
-  .slot-addr  { color: #fab387; margin-left: auto; }
+  .list-slot:hover { background: #e6e9ef; }
+  .slot-idx   { color: #8c8fa1; min-width: 22px; }
+  .slot-sep   { color: #bcc0cc; }
+  .slot-tval  { color: #2e7d1f; }
+  .slot-addr  { color: #c2410c; margin-left: auto; }
 
   /* Bytecode panel */
   .bytecode-panel {
     margin-top: 20px;
-    background: #181825;
-    border: 1px solid #313244;
+    background: #ffffff;
+    border: 1px solid #dce0e8;
     border-radius: 10px;
     overflow: hidden;
   }
@@ -219,14 +220,14 @@
     align-items: center;
     gap: 10px;
     padding: 10px 16px;
-    border-bottom: 1px solid #313244;
+    border-bottom: 1px solid #dce0e8;
     font-size: 11px;
-    color: #6c7086;
+    color: #6c6f85;
     text-transform: uppercase;
     letter-spacing: .07em;
   }
   .bytecode-header .bc-cmd {
-    color: #89b4fa;
+    color: #1e66f5;
     font-size: 12px;
     text-transform: none;
     letter-spacing: 0;
@@ -238,17 +239,17 @@
   }
   .bytecode-table td {
     padding: 5px 16px;
-    border-bottom: 1px solid #1e1e2e;
+    border-bottom: 1px solid #eef0f4;
     white-space: nowrap;
   }
   .bytecode-table tr:last-child td { border-bottom: none; }
-  .bc-offset { color: #45475a; width: 40px; }
-  .bc-opcode { color: #cba6f7; width: 180px; font-weight: 600; }
-  .bc-arg    { color: #fab387; width: 180px; }
-  .bc-stack  { color: #6c7086; font-size: 11px; }
-  .bc-stack .stack-item { color: #a6e3a1; }
-  .bytecode-table tr.bc-active td { background: #2a2a3e; }
-  .bytecode-table tr.bc-active .bc-opcode { color: #fff; }
+  .bc-offset { color: #9ca0b0; width: 40px; }
+  .bc-opcode { color: #8839ef; width: 180px; font-weight: 600; }
+  .bc-arg    { color: #c2410c; width: 180px; }
+  .bc-stack  { color: #8c8fa1; font-size: 11px; }
+  .bc-stack .stack-item { color: #2e7d1f; }
+  .bytecode-table tr.bc-active td { background: #f1ebfe; }
+  .bytecode-table tr.bc-active .bc-opcode { color: #5b1fc0; }
   .bytecode-table tr.bc-done td { opacity: .4; }
 
   @keyframes fadeIn {
@@ -256,8 +257,8 @@
     to   { opacity: 1; transform: translateY(0); }
   }
   @keyframes pulse {
-    from { box-shadow: 0 0 0 0 rgba(243,139,168,.4); }
-    to   { box-shadow: 0 0 0 6px rgba(243,139,168,0); }
+    from { box-shadow: 0 0 0 0 rgba(210,15,57,.35); }
+    to   { box-shadow: 0 0 0 6px rgba(210,15,57,0); }
   }
 </style>
 </head>
@@ -549,7 +550,7 @@
     table.innerHTML = withStack.map((instr, i) => {
       const stackHtml = instr.stack.length
         ? instr.stack.map(s => `<span class="stack-item">${s}</span>`).join(', ')
-        : '<span style="color:#45475a">empty</span>';
+        : '<span style="color:#9ca0b0">empty</span>';
       return `<tr id="bcr${i}" class="bc-done">
         <td class="bc-offset">${instr.offset}</td>
         <td class="bc-opcode">${instr.opcode}</td>
@@ -646,7 +647,7 @@
 
   function showToastInfo(msg) {
     const t = document.getElementById('toast');
-    t.style.background = '#89b4fa';
+    t.style.background = '#1e66f5';
     t.textContent = msg;
     t.classList.add('show');
     clearTimeout(t._timer);
@@ -718,7 +719,7 @@
         <hr class="div">
         <div class="obj-field"><span class="fk">id</span><span class="fv addr">${o.addr}</span></div>
         <div class="obj-field"><span class="fk">ref count</span><span class="fv refc ${o.refCount <= 0 ? 'zero' : ''}">${o.refCount}</span></div>
-        ${o.interned ? '<div style="font-size:10px;color:#f9e2af;margin-top:5px">⚡ interned</div>' : ''}
+        ${o.interned ? '<div style="font-size:10px;color:#a6620c;margin-top:5px">⚡ interned</div>' : ''}
       `;
       c.innerHTML = html;
 
